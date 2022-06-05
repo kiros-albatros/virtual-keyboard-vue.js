@@ -1,15 +1,26 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Virtual_keyboard title="Virtual keyboard" :engKeys = "engKeys" :ruKeys = "ruKeys"/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import {engKeys, ruKeys} from './keys';
+import Virtual_keyboard from './components/Virtual_keyboard.vue'
+
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Virtual_keyboard
+  },
+  data() {
+    return {engKeys: {}, ruKeys: {}}
+  } ,
+  created()  {
+    this.engKeys = engKeys,
+    this.ruKeys = ruKeys
+  },
+  methods: {
+     
   }
 }
 </script>
