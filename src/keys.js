@@ -128,7 +128,7 @@ export const ruKeys = [
     { id: 53, name: "Slash", value: ".", class: "key" },
     { id: 54, name: "ArrowUp", value: "Up", class: "key" },
     { id: 55, name: "ShiftRight", value: "Shift", class: "key double" },
-    { id: 56, name: "ControlLeft", value: "Ctrl", class: "key" },
+    { id: 56, name: "ControlLeft", value: "Ctrl", class: "key double" },
     { id: 57, name: "MetaLeft", value: "Win", class: "key" },
     { id: 58, name: "AltLeft", value: "Alt", class: "key" },
     { id: 59, name: "Space", value: "Space", class: "key space-button" },

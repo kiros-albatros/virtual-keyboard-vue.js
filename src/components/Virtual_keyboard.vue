@@ -1,5 +1,6 @@
 <template>
     <h1>{{ title }}</h1>
+    <h2>lang ru: {{ this.$store.state.ru }}</h2>
     <textarea :key="textarea" class="textarea">{{ textarea }}</textarea>
     <ul class="keyboard">
         <li
@@ -23,15 +24,15 @@ export default {
         return {
             textarea: "",
             currentKeys: this.engKeys,
-            isActive: false,
+            //  isActive: false,
         };
     },
 
     created() {
-        window.addEventListener("keydown", (event) =>
+        document.addEventListener("keydown", (event) =>
             this.keyDownHandler(event)
         );
-        window.addEventListener("keyup", (event) => this.keyUpHandler(event));
+        document.addEventListener("keyup", () => this.keyUpHandler());
     },
 
     props: {
@@ -40,37 +41,95 @@ export default {
         title: String,
     },
     methods: {
-        //при нажатии мышкой начало
+        //при нажатии мышкой - начало
+        switchCases(variable, event) {
+            console.log('switchCases works');
+            console.log(variable);
+             console.log(event);
+            switch (variable) {
+                case "Space":
+                    if (variable === event.code) {
+                        event.preventDefault();
+                    }
+                    this.textarea += " ";
+                    break;
+                case "Backspace":
+                case "Delete":
+                    this.textarea = this.textarea.slice(0, -1);
+                    break;
+                case "Enter":
+                    this.textarea += "\n";
+                    break;
+                case "Tab":
+                    this.textarea += "\t";
+                    break;
+                case "ControlRight":
+                case "ControlLeft":
+                case "AltRight":
+                case "AltLeft":
+                case "ShiftLeft":
+                case "ShiftRight":
+                    this.textarea = this.textarea;
+                    break;
+                case "CapsLock":
+                    this.$store.commit("changeCapsLock");
+                    break;
+                default:
+                    if (variable === event.code) {
+                        if (this.$store.state.CapsLock) {
+                            this.textarea += event.key.toUpperCase();
+                        } else {
+                            this.textarea += event.key.toLowerCase();
+                        }
+                    } else {
+                        if (this.$store.state.CapsLock) {
+                            this.textarea += key.value.toUpperCase();
+                        } else {
+                            this.textarea += key.value.toLowerCase();
+                        }
+                    }
+                    return this.textarea;
+            }
+        },
+
         mouseDownHandler(key) {
             const el = document.getElementById(key.id);
             el.classList.add("press");
 
-            if (key.name == "Space") {
-                this.textarea += " ";
-            } else if (key.name == "Backspace" || key.name == "Delete") {
-                this.textarea = this.textarea.slice(0, -1);
-            } else if (key.name == "Enter") {
-                this.textarea += "\n";
-            } else if (key.name == "Tab") {
-                this.textarea += "\t";
-            } else if (
-                key.name == "ControlRight" ||
-                key.name == "ControlLeft" ||
-                key.name == "AltRight" ||
-                key.name == "AltLeft" ||
-                key.name == "ShiftLeft" ||
-                key.name == "ShiftRight"
-            ) {
-                this.textarea = this.textarea;
-            } else if (key.name == "CapsLock") {
-                this.$store.commit("changeCapsLock");
-            } else {
-                if (this.$store.state.CapsLock) {
-                    this.textarea += key.value.toUpperCase();
-                } else {
-                    this.textarea += key.value.toLowerCase();
-                }
-            }
+            // switch (key.name) {
+            //     case "Space":
+            //         this.textarea += " ";
+            //         break;
+            //     case "Backspace":
+            //     case "Delete":
+            //         this.textarea = this.textarea.slice(0, -1);
+            //         break;
+            //     case "Enter":
+            //         this.textarea += "\n";
+            //         break;
+            //     case "Tab":
+            //         this.textarea += "\t";
+            //         break;
+            //     case "ControlRight":
+            //     case "ControlLeft":
+            //     case "AltRight":
+            //     case "AltLeft":
+            //     case "ShiftLeft":
+            //     case "ShiftRight":
+            //         this.textarea = this.textarea;
+            //         break;
+            //     case "CapsLock":
+            //         this.$store.commit("changeCapsLock");
+            //         break;
+            //     default:
+            //         if (this.$store.state.CapsLock) {
+            //             this.textarea += key.value.toUpperCase();
+            //         } else {
+            //             this.textarea += key.value.toLowerCase();
+            //         }
+            //         break;
+            // }
+            this.switchCases(key, event);
             return this.textarea;
         },
 
@@ -79,11 +138,14 @@ export default {
             el.classList.remove("press");
         },
 
-        //при нажатии мышкой конец
+        //при нажатии мышкой - конец
 
+        // перерисовка клавиш из-за смены языка
 
-         setLang() {
-            if (this.$store.state.ru) {
+        setLang() {
+            console.log("CHANGE LANG");
+            this.$store.commit("changeLang");
+            if (this.$store.state.ru === true) {
                 this.currentKeys = this.ruKeys;
             } else {
                 this.currentKeys = this.engKeys;
@@ -93,92 +155,88 @@ export default {
         //при нажатии клавиш - начало
 
         keyDownHandler(event) {
-            console.log("fuck", event.code);
-
             this.$store.commit("addPressedButtons", event.code);
 
-            //  проверяем на смену языка - начало
-
-            if (
-                event.code === "ShiftLeft" &&
-                this.$store.state.pressedButtons[0] === "AltLeft"
-            ) {
-                console.log("CHANGE LANG");
-                this.$store.commit("changeLang");
-                this.setLang();
-                return
-            } 
-            if (
-                event.code === "AltLeft" &&
-                this.$store.state.pressedButtons[0] === "ShiftLeft"
-            ) {
-                console.log("CHANGE LANG");
-                this.$store.commit("changeLang");
-                this.setLang();
-                return
-            }
-
-              //  проверяем на смену языка - конец
-
-            if (event.code == "CapsLock") {
-                this.$store.commit("changeCapsLock");
-                return
-            }
-
-            if (event.code == "Backspace" || event.code == "Delete") {
-                this.textarea = this.textarea.slice(0, -1);
-            } else if (event.code == "Enter") {
-                this.textarea += "\n";
-            } else if (event.code == "Tab") {
-                this.textarea += "    ";
-            } else if (event.code == "Space") {
-                this.textarea += " ";
-            }
-
-            if (this.$store.state.CapsLock && event.code !== "CapsLock") {
-                this.currentKeys.map((currentKey) => {
-                    if (currentKey.name === event.code) {
-                        console.log(currentKey.value);
-                        return (this.textarea +=
-                            currentKey.value.toUpperCase());
+            // проверка переключения языка
+            if (this.$store.state.pressedButtons.length === 2) {
+                if (event.altKey && event.shiftKey) {
+                    if (
+                        this.$store.state.pressedButtons.includes(
+                            "ShiftLeft"
+                        ) &&
+                        this.$store.state.pressedButtons.includes("AltLeft")
+                    ) {
+                        this.setLang();
+                    } else {
+                        return;
                     }
-                });
+                } else if (event.shiftKey) {
+                    if (
+                        this.$store.state.pressedButtons[1] !==
+                        ("ShiftLeft" || "ShiftRight" || "AltLeft")
+                    ) {
+                        this.currentKeys.map((currentKey) => {
+                            if (
+                                currentKey.name ===
+                                this.$store.state.pressedButtons[1]
+                            ) {
+                                let letter = currentKey.value;
+                                return (this.textarea += letter.toUpperCase());
+                            }
+                        });
+                    }
+                }
+            } else if (this.$store.state.pressedButtons.length === 1) {
+                switch (event.code) {
+                    case "Space":
+                        event.preventDefault();
+                        this.textarea += " ";
+                        break;
+                    case "Backspace":
+                    case "Delete":
+                        this.textarea = this.textarea.slice(0, -1);
+                        break;
+                    case "Enter":
+                        this.textarea += "\n";
+                        break;
+                    case "Tab":
+                        this.textarea += "\t";
+                        break;
+                    case "ControlRight":
+                    case "ControlLeft":
+                    case "AltRight":
+                    case "AltLeft":
+                    case "ShiftRight":
+                    case "ShiftLeft":
+                        this.textarea = this.textarea;
+                        break;
+                    case "CapsLock":
+                        this.$store.commit("changeCapsLock");
+                        break;
+                    default:
+                        if (this.$store.state.CapsLock) {
+                            return (this.textarea += event.key.toUpperCase());
+                        } else {
+                            return (this.textarea += event.key.toLowerCase());
+                        }
+                }
             }
 
-           
-            //     localStorage["rus"] = "true";
-            //     let russ = localStorage.getItem("rus");
-            //   } else {
-            //     ru = false;
-            //     currentKeys = engKeys;
-            //     printChars();
-
-            //     localStorage["rus"] = "false";
-            //     let russ = localStorage.getItem("rus");
-            //   }
-       
-            return
+            return this.textarea;
         },
 
-        // } else if (
-        //   event.code == "ControlRight" ||
-        //   event.code == "ControlLeft" ||
-        //   event.code == "AltRight" ||
-        //   event.code == "AltLeft"
-        // ) {
-        //   textarea.innerHTML = textarea.innerHTML;
-        // } else {
-        //   if (shiftOn !== true && CapsLock !== true) {
-        //     this.textarea += currentKeys[event.code].toLowerCase();
+        //     localStorage["rus"] = "true";
+        //     let russ = localStorage.getItem("rus");
         //   } else {
-        //     this.textarea += currentKeys[event.code].toUpperCase();
-        //   }
-        //   shiftOn = false;
-        // }
-        // },
+        //     ru = false;
+        //     currentKeys = engKeys;
+        //     printChars();
 
-        keyUpHandler(event) {
-            console.log("keyup");
+        //     localStorage["rus"] = "false";
+        //     let russ = localStorage.getItem("rus");
+        //   }
+
+        keyUpHandler() {
             this.$store.commit("cleanPressedButtons");
         },
     },
