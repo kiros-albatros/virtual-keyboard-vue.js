@@ -10,7 +10,6 @@
             :data-key="key.key"
             :class="key.class"
             @mousedown="() => mouseDownHandler(key)"
-            @mouseup="() => mouseUpHandler(key)"
         >
             {{ key.value }}
         </li>
@@ -43,9 +42,6 @@ export default {
         //при нажатии мышкой - начало
 
         mouseDownHandler(key) {
-            // const el = document.getElementById(key.id);
-            // el.classList.add("press");
-
             switch (key.name) {
                 case "Space":
                     this.textarea += " ";
@@ -89,11 +85,6 @@ export default {
             return this.textarea;
         },
 
-        // mouseUpHandler(key) {
-        //     const el = document.getElementById(key.id);
-        //     el.classList.remove("press");
-        // },
-
         //при нажатии мышкой - конец
 
         //при нажатии клавиш - начало
@@ -124,6 +115,7 @@ export default {
                         return;
                     }
                 } else if (event.shiftKey) {
+                    // проверяем зажат ли Shift для заглавных букв
                     if (
                         this.$store.state.pressedButtons[1] !==
                         ("ShiftLeft" || "ShiftRight" || "AltLeft")
@@ -192,7 +184,6 @@ export default {
                         }
                 }
             }
-
             return this.textarea;
         },
 
@@ -210,6 +201,7 @@ textarea {
     padding: 10px;
     margin-left: 15px;
     margin-bottom: 20px;
+    resize: none;
 }
 
 .keyboard {
@@ -237,7 +229,7 @@ textarea {
 
 .key:hover {
     cursor: pointer;
-     background-color: rgb(255, 196, 0);
+    background-color: rgb(255, 196, 0);
     transition: background-color 0.5s ease-out;
 }
 
