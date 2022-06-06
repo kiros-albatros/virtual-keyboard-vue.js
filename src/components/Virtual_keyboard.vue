@@ -43,8 +43,8 @@ export default {
         //при нажатии мышкой - начало
 
         mouseDownHandler(key) {
-            const el = document.getElementById(key.id);
-            el.classList.add("press");
+            // const el = document.getElementById(key.id);
+            // el.classList.add("press");
 
             switch (key.name) {
                 case "Space":
@@ -59,6 +59,13 @@ export default {
                     break;
                 case "Tab":
                     this.textarea += "\t";
+                    break;
+                case "ArrowLeft":
+                case "ArrowDown":
+                case "ArrowRight":
+                case "ArrowUp":
+                case "MetaLeft":
+                    alert("Данные клавиши недоступны");
                     break;
                 case "ControlRight":
                 case "ControlLeft":
@@ -82,10 +89,10 @@ export default {
             return this.textarea;
         },
 
-        mouseUpHandler(key) {
-            const el = document.getElementById(key.id);
-            el.classList.remove("press");
-        },
+        // mouseUpHandler(key) {
+        //     const el = document.getElementById(key.id);
+        //     el.classList.remove("press");
+        // },
 
         //при нажатии мышкой - конец
 
@@ -146,7 +153,15 @@ export default {
                         this.textarea += "\n";
                         break;
                     case "Tab":
+                        event.preventDefault();
                         this.textarea += "\t";
+                        break;
+                    case "ArrowLeft":
+                    case "ArrowDown":
+                    case "ArrowRight":
+                    case "ArrowUp":
+                    case "MetaLeft":
+                        alert("Данные клавиши недоступны");
                         break;
                     case "ControlRight":
                     case "ControlLeft":
@@ -222,6 +237,8 @@ textarea {
 
 .key:hover {
     cursor: pointer;
+     background-color: rgb(255, 196, 0);
+    transition: background-color 0.5s ease-out;
 }
 
 .double {
