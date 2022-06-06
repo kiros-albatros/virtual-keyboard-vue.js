@@ -1,6 +1,6 @@
 <template>
     <h1>{{ title }}</h1>
-    <h2>lang ru: {{ this.$store.state.ru }}</h2>
+    <h6>Нажмите Alt+Shift для смены языка</h6>
     <textarea :key="textarea" class="textarea">{{ textarea }}</textarea>
     <ul class="keyboard">
         <li
@@ -24,7 +24,6 @@ export default {
         return {
             textarea: "",
             currentKeys: this.engKeys,
-            //  isActive: false,
         };
     },
 
@@ -42,15 +41,13 @@ export default {
     },
     methods: {
         //при нажатии мышкой - начало
-        switchCases(variable, event) {
-            console.log('switchCases works');
-            console.log(variable);
-             console.log(event);
-            switch (variable) {
+
+        mouseDownHandler(key) {
+            const el = document.getElementById(key.id);
+            el.classList.add("press");
+
+            switch (key.name) {
                 case "Space":
-                    if (variable === event.code) {
-                        event.preventDefault();
-                    }
                     this.textarea += " ";
                     break;
                 case "Backspace":
@@ -75,61 +72,13 @@ export default {
                     this.$store.commit("changeCapsLock");
                     break;
                 default:
-                    if (variable === event.code) {
-                        if (this.$store.state.CapsLock) {
-                            this.textarea += event.key.toUpperCase();
-                        } else {
-                            this.textarea += event.key.toLowerCase();
-                        }
+                    if (this.$store.state.CapsLock) {
+                        this.textarea += key.value.toUpperCase();
                     } else {
-                        if (this.$store.state.CapsLock) {
-                            this.textarea += key.value.toUpperCase();
-                        } else {
-                            this.textarea += key.value.toLowerCase();
-                        }
+                        this.textarea += key.value.toLowerCase();
                     }
-                    return this.textarea;
+                    break;
             }
-        },
-
-        mouseDownHandler(key) {
-            const el = document.getElementById(key.id);
-            el.classList.add("press");
-
-            // switch (key.name) {
-            //     case "Space":
-            //         this.textarea += " ";
-            //         break;
-            //     case "Backspace":
-            //     case "Delete":
-            //         this.textarea = this.textarea.slice(0, -1);
-            //         break;
-            //     case "Enter":
-            //         this.textarea += "\n";
-            //         break;
-            //     case "Tab":
-            //         this.textarea += "\t";
-            //         break;
-            //     case "ControlRight":
-            //     case "ControlLeft":
-            //     case "AltRight":
-            //     case "AltLeft":
-            //     case "ShiftLeft":
-            //     case "ShiftRight":
-            //         this.textarea = this.textarea;
-            //         break;
-            //     case "CapsLock":
-            //         this.$store.commit("changeCapsLock");
-            //         break;
-            //     default:
-            //         if (this.$store.state.CapsLock) {
-            //             this.textarea += key.value.toUpperCase();
-            //         } else {
-            //             this.textarea += key.value.toLowerCase();
-            //         }
-            //         break;
-            // }
-            this.switchCases(key, event);
             return this.textarea;
         },
 
@@ -140,24 +89,14 @@ export default {
 
         //при нажатии мышкой - конец
 
-        // перерисовка клавиш из-за смены языка
-
-        setLang() {
-            console.log("CHANGE LANG");
-            this.$store.commit("changeLang");
-            if (this.$store.state.ru === true) {
-                this.currentKeys = this.ruKeys;
-            } else {
-                this.currentKeys = this.engKeys;
-            }
-        },
-
         //при нажатии клавиш - начало
 
         keyDownHandler(event) {
             this.$store.commit("addPressedButtons", event.code);
 
-            // проверка переключения языка
+            // pressedButtons - массив одновременно нажатых клавиш
+
+            // проверка для переключения языка: левые Alt+Shift
             if (this.$store.state.pressedButtons.length === 2) {
                 if (event.altKey && event.shiftKey) {
                     if (
@@ -166,7 +105,14 @@ export default {
                         ) &&
                         this.$store.state.pressedButtons.includes("AltLeft")
                     ) {
-                        this.setLang();
+                        console.log("CHANGE LANG");
+                        // перерисовка клавиш из-за смены языка
+                        this.$store.commit("changeLang");
+                        if (this.$store.state.ru === true) {
+                            this.currentKeys = this.ruKeys;
+                        } else {
+                            this.currentKeys = this.engKeys;
+                        }
                     } else {
                         return;
                     }
@@ -224,17 +170,6 @@ export default {
 
             return this.textarea;
         },
-
-        //     localStorage["rus"] = "true";
-        //     let russ = localStorage.getItem("rus");
-        //   } else {
-        //     ru = false;
-        //     currentKeys = engKeys;
-        //     printChars();
-
-        //     localStorage["rus"] = "false";
-        //     let russ = localStorage.getItem("rus");
-        //   }
 
         keyUpHandler() {
             this.$store.commit("cleanPressedButtons");
