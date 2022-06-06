@@ -132,7 +132,7 @@ export default {
                         });
                     }
                 }
-            } else if (this.$store.state.pressedButtons.length === 1) {
+            } else {
                 switch (event.code) {
                     case "Space":
                         event.preventDefault();
@@ -161,9 +161,19 @@ export default {
                         break;
                     default:
                         if (this.$store.state.CapsLock) {
-                            return (this.textarea += event.key.toUpperCase());
+                            this.currentKeys.map((currentKey) => {
+                                if (currentKey.name === event.code) {
+                                    return (this.textarea +=
+                                        currentKey.value.toUpperCase());
+                                }
+                            });
                         } else {
-                            return (this.textarea += event.key.toLowerCase());
+                            this.currentKeys.map((currentKey) => {
+                                if (currentKey.name === event.code) {
+                                    return (this.textarea +=
+                                        currentKey.value.toLowerCase());
+                                }
+                            });
                         }
                 }
             }
@@ -180,7 +190,7 @@ export default {
 
 <style scoped>
 textarea {
-    width: 900px;
+    width: 800px;
     border: 2px solid black;
     padding: 10px;
     margin-left: 15px;
